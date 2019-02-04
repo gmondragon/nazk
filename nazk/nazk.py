@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import pandas as pd
 import numpy as np
-from .exceptions import InvalidCurrency, InvalidSource
+from .exceptions import InvalidCurrency, InvalidSource, InvalidYearException, NoDataFoundException
 
 
 class Nazk:
@@ -35,6 +35,9 @@ class Nazk:
         return '{0}?fecha1={1}&fecha2={2}&moneda={3}&cierre='.format(self.ENDPOINT, from_date, to_date, currency)
 
     def _data_frame(self, currency_code, date, to_date):
+        # Valid dates
+        self._valid_date(date)
+        self._valid_date(to_date)
         # Dates
         date = datetime.strptime(date, '%d/%m/%Y')
         from_date = date - timedelta(days=7)
@@ -79,6 +82,13 @@ class Nazk:
             }
         return data
 
+    @staticmethod
+    def _valid_date(date):
+        date = datetime.strptime(date, '%d/%m/%Y')
+        if date.year < 2000:
+            raise InvalidYearException('Information available from the 2000 year.')
+        return True
+
     def get_exchange_rate(self, currency, date, to_date=None):
         currency_code = self._get_currency(currency)
         data_frame = self._data_frame(currency_code, date, to_date or date)
@@ -88,3 +98,5 @@ class Nazk:
                 date = datetime.strptime(date, '%d/%m/%Y')
                 return data[date.strftime(self.date_format)]
             return data
+        else:
+            raise NoDataFoundException('No data found.')
