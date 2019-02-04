@@ -13,5 +13,10 @@ setuptools.setup(
     author_email='gabriel@mondragon.pe',
     description='Get the official exchange rate of the SBS and SUNAT.',
     long_description=long_description,
-    long_description_content_type="text/markdown"
+    long_description_content_type="text/markdown",
+    install_requires=[
+        'pandas',
+        'numpy',
+        'lxml'
+    ]
 )
